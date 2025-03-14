@@ -19,6 +19,10 @@ export default function Login() {
         mode: 'onChange'
     })
 
+    function onSubmit(data: FormData) {
+        console.log(data)
+    }
+
     return (
         <ContainerAuth>
             <Link to='/' className='mb-6 max-w-sm w-full'>
@@ -31,7 +35,7 @@ export default function Login() {
 
             <form
                 className="bg-red-600 max-w-xl w-full rounded-lg"
-                action=""
+                onSubmit={handleSubmit(onSubmit)}
             >
                 <Input
                     name='email'
@@ -48,6 +52,13 @@ export default function Login() {
                     error={errors.password?.message}
                     register={register}
                 />
+
+                <button
+                    className="w-full text-white font-bold text-lg h-11 bg-zinc-900 rounded-md"
+                    type="submit"
+                >
+                    Acessar
+                </button>
             </form>
         </ContainerAuth>
     )
