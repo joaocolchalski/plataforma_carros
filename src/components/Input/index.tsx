@@ -13,13 +13,13 @@ export default function Input({ name, type, placeholder, register, error, rules 
     return (
         <div>
             <input
-                className="w-full border-1 rounded-md h-11 px-2 outline-none mb-4"
+                className="w-full border-1 rounded-md h-11 px-2 outline-none"
                 type={type}
                 placeholder={placeholder}
                 {...register(name, rules)}
                 id={name}
             />
-            {error && <p>{error}</p>}
+            {error && <p className="my-1 text-red-500">{error}</p>}
         </div>
     )
 }

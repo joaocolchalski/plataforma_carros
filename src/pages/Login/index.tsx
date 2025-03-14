@@ -1,10 +1,12 @@
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import logoImg from '../../assets/logo.svg'
 import ContainerAuth from '../../components/ContainerAuth'
 import Input from '../../components/Input'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { signInWithEmailAndPassword } from 'firebase/auth'
+import { auth } from '../../services/firebaseConnection'
 
 const schema = z.object({
     email: z.string().email('Insira um email válido!').nonempty('O campo email é obrigatório!'),
@@ -19,8 +21,21 @@ export default function Login() {
         mode: 'onChange'
     })
 
-    function onSubmit(data: FormData) {
-        console.log(data)
+    const navigate = useNavigate()
+
+    async function onSubmit(data: FormData) {
+        await signInWithEmailAndPassword(auth, data.email, data.password)
+            .then(() => {
+                alert('Seja bem vindo de volta!')
+                navigate('/dashboard')
+            })
+            .catch((err) => {
+                if (err.code === 'auth/invalid-credential') {
+                    alert('Email incorreto ou senha incorreta!')
+                } else {
+                    console.log(err.code)
+                }
+            })
     }
 
     return (
@@ -34,32 +49,43 @@ export default function Login() {
             </Link>
 
             <form
-                className="bg-red-600 max-w-xl w-full rounded-lg"
+                className="bg-white max-w-xl w-full rounded-lg p-4"
                 onSubmit={handleSubmit(onSubmit)}
             >
-                <Input
-                    name='email'
-                    type='email'
-                    placeholder='Digite seu email...'
-                    error={errors.email?.message}
-                    register={register}
-                />
+                <div className="mb-4">
+                    <Input
+                        name='email'
+                        type='email'
+                        placeholder='Digite seu email...'
+                        error={errors.email?.message}
+                        register={register}
+                    />
+                </div>
 
-                <Input
-                    name='password'
-                    type='password'
-                    placeholder='Digite sua senha...'
-                    error={errors.password?.message}
-                    register={register}
-                />
+                <div className="mb-4">
+                    <Input
+                        name='password'
+                        type='password'
+                        placeholder='Digite sua senha...'
+                        error={errors.password?.message}
+                        register={register}
+                    />
+                </div>
 
                 <button
-                    className="w-full text-white font-bold text-lg h-11 bg-zinc-900 rounded-md"
+                    className="w-full text-white font-medium text-lg h-11 bg-zinc-900 rounded-md cursor-pointer"
                     type="submit"
                 >
                     Acessar
                 </button>
             </form>
+
+            <Link
+                className="text-zinc-700"
+                to='/register'
+            >
+                Ainda não possui uma conta? Cadastre-se
+            </Link>
         </ContainerAuth>
     )
 }
