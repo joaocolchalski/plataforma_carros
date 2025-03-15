@@ -1,4 +1,5 @@
 import { Route, Routes } from "react-router";
+import PrivateApp from "./privateApp";
 
 import Home from "../pages/Home";
 import CarDetail from "../pages/CarDetail";
@@ -16,8 +17,8 @@ export default function AppRoutes() {
                 <Route index element={<Home />} />
                 <Route path="/car/:id" element={<CarDetail />} />
                 <Route path="dashboard">
-                    <Route index element={<Dashboard />} />
-                    <Route path="new" element={<New />} />
+                    <Route index element={<PrivateApp><Dashboard /></PrivateApp>} />
+                    <Route path="new" element={<PrivateApp><New /></PrivateApp>} />
                 </Route>
             </Route>
 
