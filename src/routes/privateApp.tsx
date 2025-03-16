@@ -12,7 +12,9 @@ export default function PrivateApp({ children }: PrivateProps): any {
 
     if (loadingAuth) {
         return (
-            <SpinnerLoading />
+            <div className="w-full min-h-screen flex justify-center items-center">
+                <SpinnerLoading />
+            </div>
         )
     }
 

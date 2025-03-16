@@ -7,7 +7,9 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createUserWithEmailAndPassword, signOut, updateProfile } from 'firebase/auth'
 import { auth } from '../../services/firebaseConnection'
-import { useEffect } from 'react'
+import { useContext, useEffect } from 'react'
+import { AuthContext } from '../../contexts/auth'
+import SpinnerLoading from '../../components/SpinnerLoading'
 
 const schema = z.object({
     name: z.string().trim().nonempty('O campo nome é obrigatório! (Espaços em branco não são considerados)'),
@@ -18,12 +20,14 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>
 
 export default function Register() {
-    const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
         resolver: zodResolver(schema),
         mode: 'onChange'
     })
 
     const navigate = useNavigate()
+
+    const { loadingAuth } = useContext(AuthContext)
 
     useEffect(() => {
         async function handleSignOut() {
@@ -50,6 +54,14 @@ export default function Register() {
                     console.log(err.code)
                 }
             })
+    }
+
+    if (loadingAuth) {
+        return (
+            <div className="w-full min-h-screen flex justify-center items-center">
+                <SpinnerLoading />
+            </div>
+        )
     }
 
     return (
@@ -100,7 +112,13 @@ export default function Register() {
                     className="w-full text-white font-medium text-lg h-11 bg-zinc-900 rounded-md cursor-pointer"
                     type="submit"
                 >
-                    Cadastrar
+                    {isSubmitting ? (
+                        <div className="w-full h-full flex justify-center items-center">
+                            <SpinnerLoading />
+                        </div>
+                    ) : (
+                        'Cadastrar'
+                    )}
                 </button>
             </form>
 
