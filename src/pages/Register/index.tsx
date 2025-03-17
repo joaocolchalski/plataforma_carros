@@ -27,7 +27,7 @@ export default function Register() {
 
     const navigate = useNavigate()
 
-    const { loadingAuth } = useContext(AuthContext)
+    const { loadingAuth, handleInfoUser } = useContext(AuthContext)
 
     useEffect(() => {
         async function handleSignOut() {
@@ -44,6 +44,11 @@ export default function Register() {
                     displayName: data.name
                 })
 
+                handleInfoUser({
+                    name: data.name,
+                    email: data.email,
+                    uid: user.user.uid
+                })
                 alert('Cadastrado com sucesso!')
                 navigate('/dashboard', { replace: true })
             })
