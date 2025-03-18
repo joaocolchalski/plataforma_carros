@@ -22,6 +22,5 @@ export default function PrivateApp({ children }: PrivateProps): any {
         return <Navigate to={'/login'} />
     }
 
-    console.log(signed)
     return children
 }

@@ -1,6 +1,68 @@
+import { useEffect, useState } from "react"
 import Container from "../../components/Container"
+import { collection, getDocs, orderBy, query } from "firebase/firestore"
+import { db } from "../../services/firebaseConnection"
+
+interface ImageProps {
+    uid: string,
+    name: string,
+    url: string
+}
+
+interface CarProps {
+    name: string,
+    model: string,
+    year: string,
+    km: string,
+    price: string,
+    city: string,
+    whatsapp: string,
+    description: string,
+    images: ImageProps[],
+    owner: string,
+    userUid: string,
+    createdAt: Date
+}
 
 export default function Home() {
+    const [cars, setCars] = useState<CarProps[]>([])
+
+    useEffect(() => {
+        async function loadCars() {
+            const collectionRef = collection(db, 'cars')
+
+            const q = query(collectionRef, orderBy('createdAt', "desc"))
+
+            await getDocs(q)
+                .then((cars) => {
+                    let listCars: CarProps[] = []
+                    cars.forEach(car => {
+                        listCars.push({
+                            name: car.data().name,
+                            model: car.data().model,
+                            year: car.data().year,
+                            km: car.data().km,
+                            price: car.data().price,
+                            city: car.data().city,
+                            whatsapp: car.data().whatsapp,
+                            description: car.data().description,
+                            images: car.data().images,
+                            owner: car.data().owner,
+                            userUid: car.data().userUid,
+                            createdAt: car.data().createdAt
+                        })
+                    })
+                    setCars(listCars)
+                })
+                .catch((err) => {
+                    alert('Erro ao carregar os carros!')
+                    console.log(err)
+                })
+        }
+
+        loadCars()
+    }, [])
+
     return (
         <Container>
             <section className="bg-white p-4 rounded-lg w-full max-w-3xl mx-auto flex justify-center items-center gap-2">

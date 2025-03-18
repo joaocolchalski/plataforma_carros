@@ -10,13 +10,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import SpinnerLoading from "../../../components/SpinnerLoading";
 import { AuthContext } from "../../../contexts/auth";
 import { v4 as uuidV4 } from 'uuid'
-import { storage } from "../../../services/firebaseConnection";
+import { db, storage } from "../../../services/firebaseConnection";
 import {
     ref,
     uploadBytes,
     getDownloadURL,
     deleteObject
 } from 'firebase/storage'
+import { addDoc, collection } from "firebase/firestore";
 
 const schema = z.object({
     name: z.string().trim().nonempty('O nome do carro é obrigatório!'),
@@ -50,7 +51,42 @@ export default function New() {
     const [carImages, setCarImages] = useState<ImageItensProps[]>([])
 
     async function onSubmit(data: FormData) {
-        console.log(data)
+        if (carImages.length === 0) {
+            alert('Precisa adicionar pelo menos 1 foto do carro!')
+            return
+        }
+
+        const carListImage = carImages.map(image => ({
+            uid: image.uid,
+            name: image.name,
+            url: image.url
+        }))
+
+        const collectionRef = collection(db, 'cars')
+
+        await addDoc(collectionRef, {
+            name: data.name,
+            model: data.model,
+            year: data.year,
+            km: data.km,
+            price: data.price,
+            city: data.city,
+            whatsapp: data.whatsapp,
+            description: data.description,
+            images: carListImage,
+            owner: user?.name,
+            userUid: user?.uid,
+            createdAt: new Date()
+        })
+            .then(() => {
+                alert('Carro cadastrado com sucesso!')
+                reset()
+                setCarImages([])
+            })
+            .catch((err) => {
+                alert('Erro ao cadastrar o carro!')
+                console.log(err)
+            })
     }
 
     async function handleFile(event: ChangeEvent<HTMLInputElement>) {
