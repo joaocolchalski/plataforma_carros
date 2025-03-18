@@ -2,66 +2,78 @@ import { useEffect, useState } from "react"
 import Container from "../../components/Container"
 import { collection, getDocs, orderBy, query } from "firebase/firestore"
 import { db } from "../../services/firebaseConnection"
+import { Link } from "react-router"
+import SpinnerLoading from "../../components/SpinnerLoading"
 
-interface ImageProps {
+interface CarImageProps {
     uid: string,
     name: string,
     url: string
 }
 
 interface CarProps {
+    id: string,
     name: string,
-    model: string,
     year: string,
-    km: string,
-    price: string,
-    city: string,
-    whatsapp: string,
-    description: string,
-    images: ImageProps[],
-    owner: string,
     userUid: string,
-    createdAt: Date
+    model: string,
+    price: string | number,
+    city: string,
+    km: string | number,
+    images: CarImageProps[]
 }
 
 export default function Home() {
     const [cars, setCars] = useState<CarProps[]>([])
+    const [loadImages, setLoadImages] = useState<string[]>([])
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         async function loadCars() {
             const collectionRef = collection(db, 'cars')
 
-            const q = query(collectionRef, orderBy('createdAt', "desc"))
+            const queryRef = query(collectionRef, orderBy('createdAt', "desc"))
 
-            await getDocs(q)
+            await getDocs(queryRef)
                 .then((cars) => {
-                    let listCars: CarProps[] = []
+                    let listCars = [] as CarProps[]
                     cars.forEach(car => {
                         listCars.push({
+                            id: car.id,
                             name: car.data().name,
                             model: car.data().model,
                             year: car.data().year,
-                            km: car.data().km,
-                            price: car.data().price,
+                            km: Number(car.data().km).toLocaleString('pt-BR'),
+                            price: Number(car.data().price).toLocaleString('pt-BR'),
                             city: car.data().city,
-                            whatsapp: car.data().whatsapp,
-                            description: car.data().description,
                             images: car.data().images,
-                            owner: car.data().owner,
-                            userUid: car.data().userUid,
-                            createdAt: car.data().createdAt
+                            userUid: car.data().userUid
                         })
                     })
                     setCars(listCars)
+                    setLoading(false)
                 })
                 .catch((err) => {
                     alert('Erro ao carregar os carros!')
                     console.log(err)
+                    setLoading(false)
                 })
         }
 
         loadCars()
     }, [])
+
+    function handleImageLoad(id: string) {
+        setLoadImages((prevImageLoaded) => [...prevImageLoaded, id])
+    }
+
+    if (loading) {
+        return (
+            <div className="w-full h-[calc(100vh-80px)] flex justify-center items-center">
+                <SpinnerLoading />
+            </div>
+        )
+    }
 
     return (
         <Container>
@@ -83,33 +95,51 @@ export default function Home() {
                 Carros novos e usados em todo o Brasil
             </h1>
 
-            <main className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <section className="w-full bg-white rounded-lg">
-                    <img
-                        className="w-full rounded-lg mb-2 max-h-72 object-cover hover:scale-105 transition-all"
-                        src="https://image.webmotors.com.br/_fotos/anunciousados/gigante/2025/202503/20250313/honda-civic-2-0-di-vtec-turbo-gasolina-type-r-manual-wmimagem14481999164.webp?s=fill&w=552&h=414&q=60"
-                        alt="Carro"
-                    />
-                    <p
-                        className="font-bold mt-1 mb-2 px-2"
-                    >
-                        HONDA CIVIC
-                    </p>
+            {cars.length === 0 ? (
+                <div className="w-full flex justify-center font-bold text-lg">
+                    <span>Não há carros cadastrados!</span>
+                </div>
+            ) : (
+                <main className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {cars.map(car => (
+                        <Link key={car.id} to={`/car/${car.id}`}>
+                            <section key={car.id} className="w-full bg-white rounded-lg">
+                                <div
+                                    className="w-full h-72 rounded-lg bg-slate-200 flex justify-center items-center"
+                                    style={{ display: loadImages.includes(car.id) ? 'none' : 'flex' }}
+                                >
+                                    <SpinnerLoading />
+                                </div>
+                                <img
+                                    className="w-full rounded-lg mb-2 max-h-72 object-cover hover:scale-105 transition-all"
+                                    src={car.images[0].url}
+                                    alt="Carro"
+                                    onLoad={() => handleImageLoad(car.id)}
+                                    style={{ display: loadImages.includes(car.id) ? 'block' : 'none' }}
+                                />
+                                <p
+                                    className="font-bold mt-1 mb-2 px-2"
+                                >
+                                    {car.name}
+                                </p>
 
-                    <div className="flex flex-col px-2">
-                        <span className="text-zinc-700 mb-6">2024/2024 | 23.000 km</span>
-                        <strong className="text-black font-bold text-xl">R$190.000</strong>
-                    </div>
+                                <div className="flex flex-col px-2">
+                                    <span className="text-zinc-700 mb-6">{car.year} | {car.km} km</span>
+                                    <strong className="text-black font-bold text-xl">R$ {car.price}</strong>
+                                </div>
 
-                    <div className="w-full h-px bg-slate-300 my-2"></div>
+                                <div className="w-full h-px bg-slate-300 my-2"></div>
 
-                    <div className="px-2 pb-2">
-                        <span className="text-zinc-700">
-                            Campo Grande - MS
-                        </span>
-                    </div>
-                </section>
-            </main>
+                                <div className="px-2 pb-2">
+                                    <span className="text-zinc-700">
+                                        {car.city}
+                                    </span>
+                                </div>
+                            </section>
+                        </Link>
+                    ))}
+                </main>
+            )}
         </Container >
     )
 }

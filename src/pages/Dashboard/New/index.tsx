@@ -22,12 +22,18 @@ import { addDoc, collection } from "firebase/firestore";
 const schema = z.object({
     name: z.string().trim().nonempty('O nome do carro é obrigatório!'),
     model: z.string().trim().nonempty('O modelo do carro é obrigatório!'),
-    year: z.string().trim().nonempty('O ano do carro é obrigatório!'),
-    km: z.string().trim().nonempty('Os Km do carro é obrigatório!'),
-    price: z.string().trim().nonempty('O preço do carro é obrigatório!'),
+    year: z.string().trim().min(4, 'Digite um ano válido no formato YYYY!').nonempty('O ano do carro é obrigatório!').refine((value) => /^\d+$/.test(value), {
+        message: 'Digite um ano válido no formato YYYY!'
+    }),
+    km: z.string().trim().nonempty('O Km do carro é obrigatório!').refine((value) => /^\d+$/.test(value), {
+        message: 'Digite um Km válido (Sem pontos e vírgulas)'
+    }),
+    price: z.string().trim().nonempty('O valor do carro é obrigatório!').refine((value) => /^\d+$/.test(value), {
+        message: 'Digite um valor válido (Sem pontos e vírgulas)'
+    }),
     city: z.string().trim().nonempty('A cidade do carro é obrigatória!'),
     whatsapp: z.string().nonempty('O telefone é obrigatório!').refine((value) => /^\d{2,3} ?\d{9}$/.test(value), {
-        message: 'Digite um telefone válido no formato DD + 9 números!'
+        message: 'Digite um telefone válido no formato DD + 9 números! (Sem espaços!)'
     }),
     description: z.string().nonempty('A descrição é obrigatória!')
 })
