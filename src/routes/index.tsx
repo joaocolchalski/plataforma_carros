@@ -7,6 +7,7 @@ import Dashboard from "../pages/Dashboard";
 import New from "../pages/Dashboard/New";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
+import Error from "../pages/Error";
 
 import LayoutHome from "../components/LayoutHome";
 
@@ -24,6 +25,8 @@ export default function AppRoutes() {
 
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+
+            <Route path="*" element={<Error />} />
         </Routes>
     )
 }

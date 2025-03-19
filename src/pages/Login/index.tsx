@@ -94,7 +94,7 @@ export default function Login() {
                 </div>
 
                 <button
-                    className="w-full text-white font-medium text-lg h-11 bg-zinc-900 rounded-md cursor-pointer"
+                    className="w-full text-white font-medium text-lg h-11 bg-zinc-900 rounded-md"
                     type="submit"
                 >
                     {isSubmitting ? (
