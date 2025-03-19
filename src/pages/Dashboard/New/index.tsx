@@ -22,8 +22,8 @@ import { addDoc, collection } from "firebase/firestore";
 const schema = z.object({
     name: z.string().trim().nonempty('O nome do carro é obrigatório!'),
     model: z.string().trim().nonempty('O modelo do carro é obrigatório!'),
-    year: z.string().trim().min(4, 'Digite um ano válido no formato YYYY!').nonempty('O ano do carro é obrigatório!').refine((value) => /^\d+$/.test(value), {
-        message: 'Digite um ano válido no formato YYYY!'
+    year: z.string().trim().min(4, 'Digite um ano válido no formato YYYY!').nonempty('O ano do carro é obrigatório!').refine((value) => /^\d{4}\/\d{4}$/.test(value), {
+        message: 'Digite um ano válido no formato YYYY/YYYY!'
     }),
     km: z.string().trim().nonempty('O Km do carro é obrigatório!').refine((value) => /^\d+$/.test(value), {
         message: 'Digite um Km válido (Sem pontos e vírgulas)'
@@ -71,18 +71,19 @@ export default function New() {
         const collectionRef = collection(db, 'cars')
 
         await addDoc(collectionRef, {
-            name: data.name,
-            model: data.model,
+            name: data.name.toUpperCase(),
+            model: data.model.toUpperCase(),
             year: data.year,
             km: data.km,
             price: data.price,
-            city: data.city,
+            city: data.city.toUpperCase(),
             whatsapp: data.whatsapp,
             description: data.description,
             images: carListImage,
             owner: user?.name,
             userUid: user?.uid,
-            createdAt: new Date()
+            createdAt: new Date(),
+            keywords: data.name.toUpperCase().split(' ')
         })
             .then(() => {
                 alert('Carro cadastrado com sucesso!')
