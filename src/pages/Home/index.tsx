@@ -45,7 +45,7 @@ export default function Home() {
 
     async function loadCars() {
         const collectionRef = collection(db, 'cars')
-        const queryRef = query(collectionRef, orderBy('createdAt', "desc"), limit(2));
+        const queryRef = query(collectionRef, orderBy('createdAt', "desc"), limit(6));
         const querySnapshot = await getDocs(queryRef)
         handleListCars(querySnapshot, true)
     }
@@ -63,7 +63,7 @@ export default function Home() {
             orderBy('createdAt', 'desc'),
             where('name', '>=', inputSearchCar.toUpperCase()),
             where('name', '<=', inputSearchCar.toUpperCase() + '\uf8ff'),
-            limit(2)
+            limit(6)
         )
 
         const querySnapshot = await getDocs(queryRef)
@@ -108,10 +108,10 @@ export default function Home() {
                 where('name', '>=', inputSearchCar.toUpperCase()),
                 where('name', '<=', inputSearchCar.toUpperCase() + '\uf8ff'),
                 startAfter(lastCar),
-                limit(2)
+                limit(6)
             )
         } else {
-            queryRef = query(collectionRef, orderBy('createdAt', 'desc'), startAfter(lastCar), limit(2))
+            queryRef = query(collectionRef, orderBy('createdAt', 'desc'), startAfter(lastCar), limit(6))
         }
 
         const querySnapshot = await getDocs(queryRef)
