@@ -82,8 +82,7 @@ export default function New() {
             images: carListImage,
             owner: user?.name,
             userUid: user?.uid,
-            createdAt: new Date(),
-            keywords: data.name.toUpperCase().split(' ')
+            createdAt: new Date()
         })
             .then(() => {
                 alert('Carro cadastrado com sucesso!')
