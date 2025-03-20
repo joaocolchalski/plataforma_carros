@@ -10,6 +10,7 @@ import { auth } from '../../services/firebaseConnection'
 import { useContext, useEffect } from 'react'
 import { AuthContext } from '../../contexts/auth'
 import SpinnerLoading from '../../components/SpinnerLoading'
+import toast from 'react-hot-toast'
 
 const schema = z.object({
     name: z.string().trim().nonempty('O campo nome é obrigatório! (Espaços em branco não são considerados)'),
@@ -49,12 +50,12 @@ export default function Register() {
                     email: data.email,
                     uid: user.user.uid
                 })
-                alert('Cadastrado com sucesso!')
+                toast.success('Bem vindo a plataforma!')
                 navigate('/dashboard', { replace: true })
             })
             .catch((err) => {
                 if (err.code === 'auth/email-already-in-use') {
-                    alert('Email já em uso por outro usuário!')
+                    toast.error('Email já em uso por outro usuário!')
                 } else {
                     console.log(err.code)
                 }

@@ -39,13 +39,9 @@ export default function Home() {
         handleSearchCar()
     }, [inputSearchCar])
 
-    useEffect(() => {
-        console.log(loadImages)
-    }, [loadImages])
-
     async function loadCars() {
         const collectionRef = collection(db, 'cars')
-        const queryRef = query(collectionRef, orderBy('createdAt', "desc"), limit(6));
+        const queryRef = query(collectionRef, orderBy('createdAt', "desc"), limit(12));
         const querySnapshot = await getDocs(queryRef)
         handleListCars(querySnapshot, true)
     }
@@ -63,16 +59,16 @@ export default function Home() {
             orderBy('createdAt', 'desc'),
             where('name', '>=', inputSearchCar.toUpperCase()),
             where('name', '<=', inputSearchCar.toUpperCase() + '\uf8ff'),
-            limit(6)
+            limit(12)
         )
 
         const querySnapshot = await getDocs(queryRef)
+        setCars([])
         handleListCars(querySnapshot, true)
     }
 
     function handleListCars(cars: QuerySnapshot, reset = false) {
         if (cars.empty) {
-            setCars([])
             setIsEmpty(true)
             setLoading(false)
             return
@@ -108,10 +104,10 @@ export default function Home() {
                 where('name', '>=', inputSearchCar.toUpperCase()),
                 where('name', '<=', inputSearchCar.toUpperCase() + '\uf8ff'),
                 startAfter(lastCar),
-                limit(6)
+                limit(12)
             )
         } else {
-            queryRef = query(collectionRef, orderBy('createdAt', 'desc'), startAfter(lastCar), limit(6))
+            queryRef = query(collectionRef, orderBy('createdAt', 'desc'), startAfter(lastCar), limit(12))
         }
 
         const querySnapshot = await getDocs(queryRef)
@@ -162,12 +158,12 @@ export default function Home() {
                             <Link key={car.id} to={`/car/${car.id}`}>
                                 <section key={car.id} className="w-full bg-white rounded-lg">
                                     <div
-                                        className="w-full h-72  min-h-72 rounded-lg bg-slate-200 flex justify-center items-center"
+                                        className="w-full h-72 mb-2 rounded-lg bg-slate-200 flex justify-center items-center"
                                     >
                                         {!loadImages?.has(car.id) && <SpinnerLoading />}
 
                                         <img
-                                            className="w-full rounded-lg mb-2 max-h-72 object-cover hover:scale-105 transition-all"
+                                            className="w-full rounded-lg h-72 object-cover hover:scale-105 transition-all"
                                             src={car.images[0].url}
                                             alt="Carro"
                                             onLoad={() => handleImageLoad(car.id)}

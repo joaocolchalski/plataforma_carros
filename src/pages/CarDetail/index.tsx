@@ -7,6 +7,7 @@ import SpinnerLoading from "../../components/SpinnerLoading"
 import { FaWhatsapp } from "react-icons/fa"
 
 import { Swiper, SwiperSlide } from 'swiper/react';
+import toast from "react-hot-toast"
 
 interface CarImageProps {
     uid: string,
@@ -51,7 +52,7 @@ export default function CarDetail() {
                         return
                     }
 
-                    let data = {
+                    setCar({
                         id: snapshot.id,
                         city: snapshot.data()?.city,
                         description: snapshot.data()?.description,
@@ -64,13 +65,12 @@ export default function CarDetail() {
                         year: snapshot.data()?.year,
                         owner: snapshot.data()?.owner,
                         userUid: snapshot.data()?.userUid
-                    }
+                    })
 
-                    setCar(data)
                     setLoading(false)
                 })
                 .catch((err) => {
-                    alert('Erro ao encontrar o carro!')
+                    toast.error('Erro ao encontrar o carro!')
                     console.log(err)
                     setLoading(false)
                     setCar(null)

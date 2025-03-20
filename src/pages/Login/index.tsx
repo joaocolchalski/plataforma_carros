@@ -10,6 +10,7 @@ import { auth } from '../../services/firebaseConnection'
 import { useContext, useEffect } from 'react'
 import { AuthContext } from '../../contexts/auth'
 import SpinnerLoading from '../../components/SpinnerLoading'
+import toast from 'react-hot-toast'
 
 const schema = z.object({
     email: z.string().email('Insira um email válido!').nonempty('O campo email é obrigatório!'),
@@ -39,12 +40,12 @@ export default function Login() {
     async function onSubmit(data: FormData) {
         await signInWithEmailAndPassword(auth, data.email, data.password)
             .then(() => {
-                alert('Seja bem vindo de volta!')
+                toast.success('Seja bem vindo de volta!')
                 navigate('/dashboard')
             })
             .catch((err) => {
                 if (err.code === 'auth/invalid-credential') {
-                    alert('Email incorreto ou senha incorreta!')
+                    toast.error('Email incorreto ou senha incorreta!')
                 } else {
                     console.log(err.code)
                 }

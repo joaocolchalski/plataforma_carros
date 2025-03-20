@@ -8,6 +8,7 @@ import SpinnerLoading from "../../components/SpinnerLoading";
 import { Link } from "react-router";
 import { FiTrash2 } from "react-icons/fi";
 import { deleteObject, ref } from 'firebase/storage'
+import toast from "react-hot-toast";
 
 interface CarImageProps {
     uid: string,
@@ -76,10 +77,10 @@ export default function Dashboard() {
         await deleteDoc(docRef)
             .then(() => {
                 deleteCarImages(car.images)
-                alert('Carro deletado com sucesso!')
+                toast.success('Carro deletado com sucesso!')
             })
             .catch((err) => {
-                alert('Erro ao deletar o carro!')
+                toast.error('Erro ao deletar o carro!')
                 console.log(err)
             })
     }
@@ -92,7 +93,6 @@ export default function Dashboard() {
             try {
                 await deleteObject(imageRef)
             } catch (err) {
-                alert('Erro ao deletar a imagem!')
                 console.log(err)
             }
         })

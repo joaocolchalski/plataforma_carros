@@ -18,6 +18,7 @@ import {
     deleteObject
 } from 'firebase/storage'
 import { addDoc, collection } from "firebase/firestore";
+import toast from "react-hot-toast";
 
 const schema = z.object({
     name: z.string().trim().nonempty('O nome do carro é obrigatório!'),
@@ -58,7 +59,7 @@ export default function New() {
 
     async function onSubmit(data: FormData) {
         if (carImages.length === 0) {
-            alert('Precisa adicionar pelo menos 1 foto do carro!')
+            toast.error('Precisa adicionar pelo menos 1 foto do carro!')
             return
         }
 
@@ -85,12 +86,12 @@ export default function New() {
             createdAt: new Date()
         })
             .then(() => {
-                alert('Carro cadastrado com sucesso!')
+                toast.success('Carro cadastrado com sucesso!')
                 reset()
                 setCarImages([])
             })
             .catch((err) => {
-                alert('Erro ao cadastrar o carro!')
+                toast.error('Erro ao cadastrar o carro!')
                 console.log(err)
             })
     }
@@ -102,7 +103,7 @@ export default function New() {
             if (image.type === 'image/jpeg' || image.type === 'image/png') {
                 await handleUpload(image)
             } else {
-                alert('A imagem precisa ser no forma JPEG ou PNG')
+                toast.error('A imagem precisa ser no forma JPEG ou PNG')
                 return
             }
         }
@@ -129,6 +130,7 @@ export default function New() {
                     }
 
                     setCarImages((images) => [...images, imageItem])
+                    toast.success('Imagem adicionada com sucesso!')
                 })
             })
     }
@@ -143,8 +145,9 @@ export default function New() {
 
             setCarImages(newCarImages)
             await deleteObject(deleteRef)
+            toast.success('Imagem deletada com sucesso!')
         } catch (err) {
-            alert('Erro ao deletar a imagem!')
+            toast.error('Erro ao deletar a imagem!')
             console.log(err)
         }
     }
